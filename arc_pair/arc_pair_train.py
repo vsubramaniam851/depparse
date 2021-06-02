@@ -141,4 +141,4 @@ def test_train(base_path, model_name, filename = 'en_ewt-ud-train.conllu', lm = 
 	arc_train(train_corpus, train_type = 'deprel', num_words = num_words, num_labels = num_labels, modelname = model_name, hidden_size = hidden_size, lr = lr, dropout = dropout, num_epochs = num_epochs, 
 			num_layers = num_layers, batch_size = batch_size, model = model, lm = lm)
 
-test_train(base_path = base_path, model_name = 'lm1deprel.pt', lm = lm_pretrained)
+# test_train(base_path = base_path, model_name = 'lm1deprel.pt', lm = lm_pretrained)

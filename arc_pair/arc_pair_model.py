@@ -27,6 +27,8 @@ class LSTMSentenceEncoding(nn.Module):
 		return outputs
 
 def lstm_pairs(word_embeddings, start_pairs, end_pairs):
+	'''Collect word representations as pairs using the start indices and end indices collected in the data_loader. Use index_select to avoid loops 
+	making the function run faster.'''
 	word_embeddings = word_embeddings.squeeze(0)
 	start_arc = torch.index_select(word_embeddings, dim = 0, index = start_pairs)
 	end_arc = torch.index_select(word_embeddings, dim = 0, index = end_pairs)
@@ -100,6 +102,8 @@ class LSTMClassifier2(nn.Module):
 		return logits
 
 def bert_pairs(word_embeddings, start_pairs, end_pairs):
+	'''Form word representation pairs from the BERT word representations using the start indices and end indices. Use index_select to make this process
+	run faster'''
 	word_embeddings = word_embeddings.squeeze(0)
 	start_arc = torch.index_select(word_embeddings, dim = 0, index = start_pairs)
 	end_arc = torch.index_select(word_embeddings, dim = 0, index = end_pairs)

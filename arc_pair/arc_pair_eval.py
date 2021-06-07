@@ -173,6 +173,7 @@ def eval_model(test_corpus, num_words,model_state_dict1, model_state_dict2 = Non
 def test_eval(model_state_dict1, model_state_dict2 = None, model = 'LSTM1', dropout = 0.25, num_layers = 2, hidden_size = 200, test_type = 'UAS', lm = None, base_path = MODEL_FOLDER):
 	base_path = os.path.join(base_path, 'UD_English-EWT')
 
+	#Data Processing
 	print('Starting data processing')
 	train_lines = preproc_conllu(base_path, filename = 'en_ewt-ud-train.conllu')
 	train_sent_collection = sentence_collection(train_lines)
@@ -189,5 +190,5 @@ def test_eval(model_state_dict1, model_state_dict2 = None, model = 'LSTM1', drop
 	test_corpus, _, _ = process_corpus(test_sent_collection, vocab_dict, label_dict, mode = 'test')
 	print('Finished data processing')
 
-
+	#Run evaluation code on trained model
 	eval_model(test_corpus, num_words,model_state_dict1, model_state_dict2, num_heads, num_deprel, model, dropout, num_layers, hidden_size, test_type, lm)

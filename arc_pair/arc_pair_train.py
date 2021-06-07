@@ -121,7 +121,7 @@ def test_train(base_path, model_name, filename = 'en_ewt-ud-train.conllu', lm = 
 	batch_size = 1
 	num_layers = 2
 	hidden_size = 200
-	lr = 0.0001
+	lr = 0.00005
 	num_epochs = 1
 	dropout = 0.33
 	model = 'LM1'

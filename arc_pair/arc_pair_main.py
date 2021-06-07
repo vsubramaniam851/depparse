@@ -46,7 +46,7 @@ def get_cmd_arguments():
 	ap.add_argument('--num_layers', type=int, default=3, action = 'store', dest = 'num_layers')
 	ap.add_argument('--hidden_size', type=int, default=200, action = 'store', dest = 'hidden_size')
 	ap.add_argument('--lr', type=float, default=0.00005, action = 'store', dest = 'lr')
-	ap.add_argument('--epochs', type=int, default=10, action = 'store', dest = 'num_epochs')
+	ap.add_argument('--epochs', type=int, default=100, action = 'store', dest = 'num_epochs')
 	ap.add_argument('--dropout', type=float, default=0.33, action = 'store', dest=  'dropout')
 
 	return ap.parse_args()

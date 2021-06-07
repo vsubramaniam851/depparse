@@ -122,7 +122,7 @@ class LMClassifier1(nn.Module):
 		self.linear8 = nn.Linear(hidden_size, hidden_size)
 		self.linear9 = nn.Linear(hidden_size, num_labels)
 
-	def forward(self, start_pairs, end_pairs, input_ids = None, attention_mask = None, hidden_state = 7):
+	def forward(self, start_pairs, end_pairs, input_ids = None, attention_mask = None, hidden_state = 4):
 		lm_output = self.lm(input_ids = input_ids, attention_mask = attention_mask, output_hidden_states = True)
 		hidden_states = lm_output.hidden_states[hidden_state]
 		hidden_states = self.dropout(hidden_states)

@@ -6,7 +6,8 @@ import argparse
 
 import torch
 import torch.nn as nn
-import torch.functional as F  
+import torch.functional as F
+from torch import cuda  
 
 from arc_pair_train import *
 from arc_pair_eval import *
@@ -39,6 +40,8 @@ def get_cmd_arguments():
 		help = 'Pytorch model that predicts the heads that can be saved to after training or loaded in for evaluation')
 	ap.add_argument('-d', '--deprelmodel', action = 'store', type = str, dest = 'deprel_model', default = 'deprelclassifier1.pt',
 		help = 'Pytorch model that predicts the dependency labels that can be saved to after training or loaded in for evaluation')
+	ap.add_argument('-s', '--savecsv', action = 'store', type = bool, dest = 'save_csv', default = False, 
+		help = 'Save processed CoNLLU files to extract more easily later.')
 
 	#Model Hyperparameters
 	ap.add_argument('--batch_size', type=int, default=1, action = 'store', dest = 'batch_size',
@@ -58,9 +61,9 @@ def main():
 	#Get path to data directory
 	data_loc = os.path.join(base_path, 'UD_English-EWT')
 	#Load training file
-	train_lines = preproc_conllu(data_loc, filename = 'en_ewt-ud-train.conllu')
+	train_lines = preproc_conllu(data_loc, filename = 'en_ewt-ud-train.conllu', save_csv = args.save_csv)
 	#Load testing file, save to CSV unless already saved.
-	test_lines = preproc_conllu(data_loc, filename = 'en_ewt-ud-test.conllu', save_csv = True)
+	test_lines = preproc_conllu(data_loc, filename = 'en_ewt-ud-test.conllu', save_csv = args.save_csv)
 
 	#DATA PROCESSING PIPELINE FOR BOTH TRAINING AND TESTING FILES
 	train_sent_collection = sentence_collection(train_lines)
@@ -88,6 +91,8 @@ def main():
 	num_heads = 2
 	num_deprel = 0
 
+	new_base_path = os.path.join(base_path, 'arc_pair')
+
 	if args.eval_type == 'LAS':
 		#Labeled attachment score needs the dependency model to be trained as well.
 		num_deprel = len(label_dict)
@@ -95,19 +100,20 @@ def main():
 		#Train the model
 		print('Training Model:', args.model)
 		if args.eval_type == 'UAS':
-			arc_train(train_corpus, train_type = 'heads', num_words = num_words, num_labels = num_heads, modelname = args.head_model, hidden_size = args.hidden_size, lr = args.lr, dropout = args.dropout, num_epochs = args.num_epochs, 
+			arc_train(train_corpus, train_type = 'heads', num_words = num_words, num_labels = num_heads, modelname = args.head_model, base_path = new_base_path, hidden_size = args.hidden_size, lr = args.lr, dropout = args.dropout, num_epochs = args.num_epochs, 
 				num_layers = args.num_layers, batch_size = args.batch_size, model = args.model, lm = lm)
 		else:
-			arc_train(train_corpus, train_type = 'heads', num_words = num_words, num_labels = num_heads, modelname = args.head_model, hidden_size = args.hidden_size, lr = args.lr, dropout = args.dropout, num_epochs = args.num_epochs, 
+			arc_train(train_corpus, train_type = 'heads', num_words = num_words, num_labels = num_heads, modelname = args.head_model, base_path = new_base_path, hidden_size = args.hidden_size, lr = args.lr, dropout = args.dropout, num_epochs = args.num_epochs, 
 				num_layers = args.num_layers, batch_size = args.batch_size, model = args.model, lm = lm)
-			arc_train(train_corpus, train_type = 'deprel', num_words = num_words, num_labels = num_deprel, modelname = args.deprel_model, hidden_size = args.hidden_size, lr = args.lr, dropout = args.dropout, num_epochs = args.num_epochs, 
+			arc_train(train_corpus, train_type = 'deprel', num_words = num_words, num_labels = num_deprel, modelname = args.deprel_model, base_path = new_base_path, hidden_size = args.hidden_size, lr = args.lr, dropout = args.dropout, num_epochs = args.num_epochs, 
 				num_layers = args.num_layers, batch_size = args.batch_size, model = args.model, lm = lm)
 	else:
 		#If model is already trained, evaluate the model
 		if args.eval_type == 'UAS':
-			print(eval_model(test_corpus, num_words = num_words, model_state_dict1 = args.head_model, model_state_dict2 = args.deprel_model, num_heads = num_heads, num_deprel = num_deprel, model = args.model, dropout = args.dropout, num_layers = args.num_layers, hidden_size = args.hidden_size, test_type = args.eval_type, lm = lm))
+			print(eval_model(test_corpus, num_words = num_words, model_state_dict1 = args.head_model, model_state_dict2 = args.deprel_model, base_path = base_path, num_heads = num_heads, num_deprel = num_deprel, model = args.model, 
+				dropout = args.dropout, num_layers = args.num_layers, hidden_size = args.hidden_size, test_type = args.eval_type, lm = lm))
 		else:
-			print(eval_model(test_corpus, num_words = num_words, model_state_dict1 = args.head_model, model_state_dict2 = args.deprel_model, num_heads = num_heads, num_deprel = num_heads, model = args.model, 
+			print(eval_model(test_corpus, num_words = num_words, model_state_dict1 = args.head_model, model_state_dict2 = args.deprel_model, base_path = base_path, num_heads = num_heads, num_deprel = num_heads, model = args.model, 
 				dropout = args.dropout, num_layers = args.num_layers, hidden_size = args.hidden_size, test_type = args.eval_type))
 
 if __name__ == '__main__':

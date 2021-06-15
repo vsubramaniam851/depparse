@@ -54,6 +54,7 @@ def eval_model(test_corpus, num_words,model_state_dict1, model_state_dict2 = Non
 			classifier = LMClassifier1(num_labels = num_heads, hidden_size = hidden_size, lm = lm, dropout = dropout)
 		else:
 			classifier = LMClassifier2(num_labels = num_heads, hidden_size = hidden_size, lm = lm, num_layers = num_layers, dropout = dropout)
+
 		model_folder = os.path.join(base_path, 'arc_pair', 'checkpoints')
 		model_loc = os.path.join(model_folder, model_state_dict1)
 		classifier.load_state_dict(torch.load(model_loc))

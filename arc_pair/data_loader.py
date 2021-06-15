@@ -6,8 +6,15 @@ import csv
 import torch
 import torch.nn as nn
 import torch.functional as F 
+from torch import cuda
 
 import transformers
+
+if cuda.is_available():
+	device = 'cuda'
+else:
+	print('WARNING, this program is running on CPU')
+	device = 'cpu'
 
 tokenizer = transformers.BertTokenizer.from_pretrained('bert-base-uncased')
 

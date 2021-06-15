@@ -25,14 +25,14 @@ else:
 	print('WARNING, this program is running on CPU')
 	device = 'cpu'
 
-base_path = '/storage/vsub851/864_final_project/UD_English-EWT'
+base_path = '/storage/vsub851/depparse/UD_English-EWT'
 filename = 'small.conllu'
 
 print('Using device: {}'.format(device)) #Ensure on GPU!
 
 lm_pretrained = transformers.BertModel.from_pretrained('bert-base-uncased').to(device)
 
-def arc_train(train_corpus, train_type, num_words, num_labels, modelname, hidden_size = 200, lr = 0.005, dropout = 0.25, num_epochs = 3, num_layers = 2, batch_size = 1, model = 'LSTM1', lm = None):
+def arc_train(train_corpus, train_type, num_words, num_labels, modelname, base_path, hidden_size = 200, lr = 0.005, dropout = 0.25, num_epochs = 3, num_layers = 2, batch_size = 1, model = 'LSTM1', lm = None):
 	'''Train the model. Specify the model type and hyperparameters. The LSTM model takes in lemmas in a sentence and predicts its heads and dependencies
 	The LM model uses the input ids and attention masks instead. 
 
@@ -109,9 +109,9 @@ def arc_train(train_corpus, train_type, num_words, num_labels, modelname, hidden
 		print('Epoch {}, train loss={}'.format(epoch, total_loss / len(train_corpus)))
 	print('TRAINING IS FINISHED')
 	#Save model using modelname passed in as parameter
-	save_path = os.path.join('/storage/vsub851/depparse/arc_pair/checkpoints', modelname)
-	if os.path.exists('/storage/vsub851/depparse/arc_pair/checkpoints'):
-		torch.save(classifier.state_dict(), save_path)
+	save_path = os.path.join(base_path, 'checkpoints')
+	if os.path.exists(save_path):
+		torch.save(classifier.state_dict(), os.path.join(save_path, modelname))
 	else:
 		print('Give a valid directory and path!')
 

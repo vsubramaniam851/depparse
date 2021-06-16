@@ -42,14 +42,16 @@ def get_cmd_arguments():
 		help = 'Pytorch model that predicts the dependency labels that can be saved to after training or loaded in for evaluation')
 	ap.add_argument('-s', '--savecsv', action = 'store', type = bool, dest = 'save_csv', default = False, 
 		help = 'Save processed CoNLLU files to extract more easily later.')
+	ap.add_argument('-l', '--language', action = 'store', type = str, dest = 'lang', default = 'en', 
+		help = 'Language to train/evaluate model on. Use German, French, or English. Default is English')
 
 	#Model Hyperparameters
 	ap.add_argument('--batch_size', type=int, default=1, action = 'store', dest = 'batch_size',
 		help = 'Change from 1 only if you use lemma padding')
 	ap.add_argument('--num_layers', type=int, default=3, action = 'store', dest = 'num_layers')
-	ap.add_argument('--hidden_size', type=int, default=200, action = 'store', dest = 'hidden_size')
+	ap.add_argument('--hidden_size', type=int, default=400, action = 'store', dest = 'hidden_size')
 	ap.add_argument('--lr', type=float, default=0.00005, action = 'store', dest = 'lr')
-	ap.add_argument('--epochs', type=int, default=100, action = 'store', dest = 'num_epochs')
+	ap.add_argument('--epochs', type=int, default=20, action = 'store', dest = 'num_epochs')
 	ap.add_argument('--dropout', type=float, default=0.33, action = 'store', dest=  'dropout')
 
 	return ap.parse_args()
@@ -58,12 +60,20 @@ def main():
 	args = get_cmd_arguments()
 	print('Start data processing')
 	base_path = args.base_path
-	#Get path to data directory
-	data_loc = os.path.join(base_path, 'UD_English-EWT')
-	#Load training file
-	train_lines = preproc_conllu(data_loc, filename = 'en_ewt-ud-train.conllu', save_csv = args.save_csv)
-	#Load testing file, save to CSV unless already saved.
-	test_lines = preproc_conllu(data_loc, filename = 'en_ewt-ud-test.conllu', save_csv = args.save_csv)
+	#Get path to data directory with correct language
+	lang = args.lang
+	if lang == 'ge':
+		data_loc = os.path.join(base_path, 'UD_German-GSD')
+		#Load training file
+		train_lines = preproc_conllu(data_loc, filename = 'de_gsd-ud-train.conllu', save_csv = args.save_csv)
+		#Load testing file, save to CSV unless already saved
+		test_lines = preproc_conllu(data_loc, filename = 'de_gsd-ud-test.conllu', save_csv = args.save_csv)
+	else:
+		data_loc = os.path.join(base_path, 'UD_English-EWT')
+		#Load training file
+		train_lines = preproc_conllu(data_loc, filename = 'en_ewt-ud-train.conllu', save_csv = args.save_csv)
+		#Load testing file, save to CSV unless already saved.
+		test_lines = preproc_conllu(data_loc, filename = 'en_ewt-ud-test.conllu', save_csv = args.save_csv)
 
 	#DATA PROCESSING PIPELINE FOR BOTH TRAINING AND TESTING FILES
 	train_sent_collection = sentence_collection(train_lines)

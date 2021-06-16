@@ -63,6 +63,7 @@ def main():
 	#Get path to data directory with correct language
 	lang = args.lang
 	if lang == 'ge':
+		print('Training in German')
 		data_loc = os.path.join(base_path, 'UD_German-GSD')
 		#Load training file
 		train_lines = preproc_conllu(data_loc, filename = 'de_gsd-ud-train.conllu', save_csv = args.save_csv)

@@ -77,27 +77,27 @@ def arc_train(train_corpus, train_type, num_words, num_labels, modelname, base_p
 			labels_batch = []
 			for sent in batch:
 				#Uncomment corresponding lines depending on whether LSTM is being used or LM
-				# word_batch.append(torch.tensor(sent['lemma_ids']).long().to(device))
+				word_batch.append(torch.tensor(sent['lemma_ids']).long().to(device))
 				start_pairs.append(torch.tensor(sent['start_arc']).long().to(device))
 				end_pairs.append(torch.tensor(sent['end_arc']).long().to(device))
-				input_ids.append(torch.tensor(sent['input_ids']).long().to(device))
-				attention_mask.append(torch.tensor(sent['attention_mask']).long().to(device))
+				# input_ids.append(torch.tensor(sent['input_ids']).long().to(device))
+				# attention_mask.append(torch.tensor(sent['attention_mask']).long().to(device))
 				labels1 = torch.tensor(sent[label_type]).long().to(device)
 				labels_batch.append(labels1)
-			# word_batch = torch.stack(word_batch).to(device)
+			word_batch = torch.stack(word_batch).to(device)
 			start_pairs = torch.stack(start_pairs).to(device)
 			start_pairs = start_pairs.squeeze(0)
 			end_pairs = torch.stack(end_pairs).to(device)
 			end_pairs = end_pairs.squeeze(0)
-			input_ids = torch.stack(input_ids).to(device)
-			attention_mask = torch.stack(attention_mask).to(device)
+			# input_ids = torch.stack(input_ids).to(device)
+			# attention_mask = torch.stack(attention_mask).to(device)
 			labels_batch = torch.stack(labels_batch).to(device)
 			labels_batch = labels_batch.squeeze(0)
 
 			#Run LSTM
-			# outputs = classifier.forward(word_batch, start_pairs, end_pairs)
+			outputs = classifier.forward(word_batch, start_pairs, end_pairs)
 			#Run LM
-			outputs = classifier.forward(input_ids = input_ids, attention_mask = attention_mask, start_pairs = start_pairs, end_pairs = end_pairs)
+			# outputs = classifier.forward(input_ids = input_ids, attention_mask = attention_mask, start_pairs = start_pairs, end_pairs = end_pairs)
 
 			#Calculate loss and step backwards through the model.
 			loss = loss_fn(outputs, labels_batch)

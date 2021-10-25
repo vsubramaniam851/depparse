@@ -156,6 +156,26 @@ def form_pairs(sent_parses):
 		new_sent_parses.append({'pairs': pairs, 'pair_heads': head_val, 'start_arc': start_arc, 'end_arc': end_arc, 'pair_deprel':deprel_val, 'sent': sent['sent'], 'input_ids': sent['input_ids'], 'attention_mask': sent['attention_mask'], 'lemma_ids': sent['lemma_ids'], 'deprel_ids': sent['deprel_ids'], 'heads': sent['heads']})
 	return new_sent_parses
 
+def get_combinations(sequence, n):
+    '''Take in sequence and generate all combinations of n elements from the sequence'''
+    if len(sequence) == n:
+        #Base case 1
+        yield sequence
+    elif n == 0:
+        #Base case 2
+        yield []
+    elif n < len(sequence):
+        first = sequence[0]
+        rest = sequence[1:]
+        #Keep first element out and generate n elements from the rest of the formula
+        yield from get_combinations(rest, n)
+        #Hold first element frozen and find the same length on the rest. 
+        for s in get_combinations(rest, n-1):
+            yield [first] + s 
+    else:
+        #Return none if n is greater as a good catch all
+        return None
+
 def data_load_test(base_path, filename, save_csv = False, mode = 'train'):
 	'''Test all data_loader.py functions in one place and has print statements under each of them that can be commented out to test particular functions. 
 	Add to this function to debug.'''

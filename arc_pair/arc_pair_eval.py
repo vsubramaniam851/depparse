@@ -2,6 +2,7 @@ import sys
 import os
 import random
 import numpy as np 
+from tqdm import tqdm
 
 import torch
 from torch import cuda
@@ -65,36 +66,38 @@ def eval_model(test_corpus, num_words,model_state_dict1, model_state_dict2 = Non
 		total_examples = 0
 		total_correct = 0
 
-		for i in range(len(test_corpus)):
+		for i in tqdm(range(len(test_corpus))):
 			sent_dict = test_corpus[i]
 			word_batch = []
 			sent_len = len(sent_dict['lemma_ids'])
-			# word_batch.append(torch.tensor(sent_dict['lemma_ids']).long().to(device))
-			# word_batch = torch.stack(word_batch).to(device)
+			word_batch.append(torch.tensor(sent_dict['lemma_ids']).long().to(device))
+			word_batch = torch.stack(word_batch).to(device)
 			input_ids = []
 			attention_mask = []
 			#Collect right inputs for right model
-			input_ids.append(torch.tensor(sent_dict['input_ids']).long().to(device))
-			attention_mask.append(torch.tensor(sent_dict['attention_mask']).long().to(device))
-			input_ids = torch.stack(input_ids).to(device)
-			attention_mask = torch.stack(attention_mask).to(device)
+			# input_ids.append(torch.tensor(sent_dict['input_ids']).long().to(device))
+			# attention_mask.append(torch.tensor(sent_dict['attention_mask']).long().to(device))
+			# input_ids = torch.stack(input_ids).to(device)
+			# attention_mask = torch.stack(attention_mask).to(device)
 			labels = torch.tensor(sent_dict[label_type]).long().to(device)
 			start_pairs = torch.tensor(sent_dict['start_arc']).long().to(device)
 			end_pairs = torch.tensor(sent_dict['end_arc']).long().to(device)
 
 			#Run and decode classifier
 			#LSTM
-			# outputs = classifier.forward(word_batch, start_pairs, end_pairs)
+			outputs = classifier.forward(word_batch, start_pairs, end_pairs)
 			#LM
-			outputs = classifier.forward(input_ids = input_ids, attention_mask = attention_mask, start_pairs = start_pairs, end_pairs = end_pairs)
+			# outputs = classifier.forward(input_ids = input_ids, attention_mask = attention_mask, start_pairs = start_pairs, end_pairs = end_pairs)
 			#Decode model to get predictions of which pairs are head-dependent
 			preds = decode_model(outputs)
 
 			#Count correct versus total examples
+			#This will count over all pairs.
 			for i in range(len(preds)):
-				if preds[i] == labels[i]:
+				if labels[i] == preds[i]:
 					total_correct += 1
 				total_examples += 1
+
 		return ('UAS score: {}').format(total_correct/total_examples)
 	#Head and Deprel Eval
 	else:

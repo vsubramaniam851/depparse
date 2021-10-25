@@ -68,15 +68,6 @@ def sent_process(base_path, sent, model):
 		sent_encoding = tokenizer.encode_plus(sent)
 		return (sent_encoding['input_ids'], sent_encoding['attention_mask'], len(vocab_dict))
 
-def is_well_formed(self, spans):
-	if len(spans) == 0:
-		return False   
-	for s1 in spans: 
-		for s2 in spans:
-			if s1[0] < s2[0] and s2[0] < s1[1] and s1[1] < s2[1]:
-				return False
-	return True
-
 def runner(sent):
 	args = get_cmd_arguments()
 	base_path = args.base_path
